@@ -1,0 +1,30 @@
+apiVersion: camel.apache.org/v1
+kind: Integration
+metadata:
+  name: system-a-v1
+spec:
+  flows:
+    - from:
+        uri: "activemq:queue:q-request"
+        steps:
+          - setBody:
+              constant: '[{"clientId":"123456","number":"123123"}]'
+          - unmarshal:
+              json:
+                library: Jackson
+          - marshal:
+              json: 
+                library: Jackson
+          - to:
+              uri: "log:info?showAll=true&multiline=true"
+          - to:
+              uri: "activemq:queue:q-response?exchangePattern=InOnly&useMessageIDAsCorrelationID=true"
+  traits:
+    logging:
+      enabled: true
+    camel:
+      enabled: true
+      properties:
+        - camel.component.activemq.brokerURL=tcp://185.192.247.130:61616
+        - camel.component.activemq.username=integrations
+        - camel.component.activemq.password=hj2X9z4r7zWK
